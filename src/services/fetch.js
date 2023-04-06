@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-const fetchImg = async userQuery => {
+const fetchImg = async (userQuery, page) => {
   const params = {
     key: '33618284-b943b6a3bf9edd3f9e88f078b',
     q: userQuery,
     image_type: 'photo',
     orientation: 'horizontal',
-    page: 1,
+    page,
     per_page: 12,
   };
 
