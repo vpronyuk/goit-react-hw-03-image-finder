@@ -6,19 +6,23 @@ import Searchbar from 'components/searchBar/Searchbar';
 import Loader from 'components/loader/Loader';
 import fetchImg from 'services/fetch';
 import Button from 'components/button/Button';
+import Modal from 'components/modal/Modal';
 
 export class App extends Component {
   state = {
     requestedImg: [],
     userQuery: '',
     isLoading: false,
-    page: 1, //// додали стейт для сторінки
+    page: 1,
+    selectedImg: null,
+    isShowModal: false,
   };
 
   async componentDidUpdate(prevProps, prevState) {
     const fixedUserQuery = this.state.userQuery.trim();
     if (prevState.userQuery !== fixedUserQuery && fixedUserQuery) {
-      this.setState({ isLoading: true });
+      // this.setState({ isLoading: true });
+      this.setState({ isLoading: true, requestedImg: [], page: 1 });
       this.loadImages(fixedUserQuery, this.state.page);
     }
   }
@@ -36,24 +40,33 @@ export class App extends Component {
   }
 
   handleLoadMore = async () => {
-    // evt.preventDefault();
     this.setState(prevState => ({ isLoading: true, page: prevState.page + 1 })); // збільшення сторінки на 1
     const newRequestedImg = await fetchImg(
       this.state.userQuery,
       this.state.page + 1
     );
-    this.setState(prevState => ({
-      requestedImg: [...prevState.requestedImg, ...newRequestedImg],
-      isLoading: false,
-    }));
+    // this.setState(prevState => ({
+    //   requestedImg: [...prevState.requestedImg, ...newRequestedImg],
+    //   isLoading: false,
+    // }));
+    this.updateImages(newRequestedImg);
+  };
+
+  toogleModal = () => {
+    this.setState(({ isShowModal }) => ({ isShowModal: !isShowModal }));
+  };
+
+  onSelectImg = largeImgURL => {
+    this.setState({ selectedImg: largeImgURL, isShowModal: true });
   };
 
   handleInputChange = evt => {
     this.setState({ userQuery: evt });
+    // this.setState({ userQuery: evt.target.value });
   };
 
   render() {
-    const { requestedImg, isLoading } = this.state;
+    const { requestedImg, isLoading, isShowModal, selectedImg } = this.state;
 
     return (
       <div className="App">
@@ -62,11 +75,17 @@ export class App extends Component {
           <Loader />
         ) : requestedImg.length > 0 ? (
           <>
-            <ImageGallery requestedImg={requestedImg} />
+            <ImageGallery
+              requestedImg={requestedImg}
+              onSelect={this.onSelectImg}
+            />
 
             <Button onClick={this.handleLoadMore} />
           </>
         ) : null}
+        {isShowModal && (
+          <Modal onClose={this.toogleModal} selectedImg={selectedImg}></Modal>
+        )}
       </div>
     );
   }
