@@ -7,6 +7,7 @@ class Searchbar extends Component {
   static propTypes = {
     handleInputChange: PropTypes.func.isRequired,
   };
+
   state = {
     value: '',
   };
@@ -26,9 +27,7 @@ class Searchbar extends Component {
       <header className="Searchbar">
         <form className="SearchForm" onSubmit={this.handleSubmit}>
           <button type="submit" className="SearchForm-button">
-            {/* <span className="SearchForm-button-label"> */}
             <BsSearch />
-            {/* </span> */}
           </button>
 
           <input

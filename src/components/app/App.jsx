@@ -21,7 +21,6 @@ export class App extends Component {
   async componentDidUpdate(prevProps, prevState) {
     const fixedUserQuery = this.state.userQuery.trim();
     if (prevState.userQuery !== fixedUserQuery && fixedUserQuery) {
-      // this.setState({ isLoading: true });
       this.setState({ isLoading: true, requestedImg: [], page: 1 });
       this.loadImages(fixedUserQuery, this.state.page);
     }
@@ -40,15 +39,11 @@ export class App extends Component {
   }
 
   handleLoadMore = async () => {
-    this.setState(prevState => ({ isLoading: true, page: prevState.page + 1 })); // збільшення сторінки на 1
+    this.setState(prevState => ({ isLoading: true, page: prevState.page + 1 }));
     const newRequestedImg = await fetchImg(
       this.state.userQuery,
       this.state.page + 1
     );
-    // this.setState(prevState => ({
-    //   requestedImg: [...prevState.requestedImg, ...newRequestedImg],
-    //   isLoading: false,
-    // }));
     this.updateImages(newRequestedImg);
   };
 
@@ -62,7 +57,6 @@ export class App extends Component {
 
   handleInputChange = evt => {
     this.setState({ userQuery: evt });
-    // this.setState({ userQuery: evt.target.value });
   };
 
   render() {
@@ -71,18 +65,18 @@ export class App extends Component {
     return (
       <div className="App">
         <Searchbar handleInputChange={this.handleInputChange} />
-        {isLoading ? (
-          <Loader />
-        ) : requestedImg.length > 0 ? (
+
+        {requestedImg.length > 0 && (
           <>
             <ImageGallery
               requestedImg={requestedImg}
               onSelect={this.onSelectImg}
             />
-
-            <Button onClick={this.handleLoadMore} />
+            {isLoading && <Loader />}
+            <Button onClick={this.handleLoadMore} isLoading={this.isLoading} />
           </>
-        ) : null}
+        )}
+
         {isShowModal && (
           <Modal onClose={this.toogleModal} selectedImg={selectedImg}></Modal>
         )}

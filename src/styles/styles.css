@@ -126,7 +126,7 @@ img {
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   grid-gap: 16px;
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: 20px;
   padding: 0;
   list-style: none;
   margin-left: auto;
@@ -208,7 +208,9 @@ img {
 
 .loader-container {
   position: fixed;
-  top: 50%;
+  margin-bottom: 20px;
+  bottom: 20px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  /* right: 50%; */
+  transform: translate(-50%);
 }

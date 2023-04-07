@@ -1,7 +1,13 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import '../../styles/styles.css';
 
 class Modal extends Component {
+  static propTypes = {
+    selectedImg: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired,
+  };
+
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown);
   }
@@ -25,7 +31,7 @@ class Modal extends Component {
     return (
       <div className="Overlay" onClick={this.handleOverlayClick}>
         <div className="Modal">
-          <img src={this.props.selectedImg} alt={this.props.tags} />
+          <img src={this.props.selectedImg} alt="Pixabay" />
         </div>
       </div>
     );
