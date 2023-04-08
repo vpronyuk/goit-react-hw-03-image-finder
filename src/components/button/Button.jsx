@@ -1,16 +1,15 @@
 import PropTypes from 'prop-types';
 
-const Button = ({ onClick, isLoading }) => {
+const Button = ({ onClick }) => {
   return (
     <button type="button" className="Button" onClick={onClick}>
-      {isLoading ? 'Loading...' : 'Load more'}
+      Load more
     </button>
   );
 };
 
 Button.propTypes = {
   onClick: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool,
 };
 
 export default Button;

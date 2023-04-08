@@ -12,7 +12,7 @@ const fetchImg = async (userQuery, page) => {
 
   try {
     const response = await axios.get('https://pixabay.com/api/', { params });
-    return response.data.hits;
+    return response.data;
   } catch (error) {
     console.error(error);
     return [];

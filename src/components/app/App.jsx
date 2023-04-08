@@ -12,39 +12,47 @@ export class App extends Component {
   state = {
     requestedImg: [],
     userQuery: '',
-    isLoading: false,
     page: 1,
     selectedImg: null,
+    error: null,
+    isLoading: false,
     isShowModal: false,
+    isShowButton: false,
   };
 
-  async componentDidUpdate(prevProps, prevState) {
-    const fixedUserQuery = this.state.userQuery.trim();
-    if (prevState.userQuery !== fixedUserQuery && fixedUserQuery) {
-      this.setState({ isLoading: true, requestedImg: [], page: 1 });
-      this.loadImages(fixedUserQuery, this.state.page);
+  componentDidUpdate(_, prevState) {
+    const { userQuery, page } = this.state;
+    if (prevState.userQuery !== userQuery || prevState.page !== page) {
+      this.loadImages(userQuery, page);
     }
   }
 
   async loadImages(userQuery, page) {
-    const newRequestedImg = await fetchImg(userQuery, page);
-    this.updateImages(newRequestedImg);
+    this.setState({ isLoading: true });
+
+    try {
+      const newRequestedImg = await fetchImg(userQuery, page);
+      if (!newRequestedImg) {
+        throw new Error('No data from server!');
+      }
+      this.setState(prevState => ({
+        requestedImg: [...prevState.requestedImg, ...newRequestedImg.hits],
+        isShowButton:
+          this.state.page < Math.ceil(newRequestedImg.totalHits / 12),
+      }));
+    } catch (error) {
+      this.setState({ error });
+    } finally {
+      this.setState({ isLoading: false });
+    }
   }
 
-  updateImages(newRequestedImg) {
-    this.setState(prevState => ({
-      requestedImg: [...prevState.requestedImg, ...newRequestedImg],
-      isLoading: false,
-    }));
-  }
+  onFormSubmit = query => {
+    this.setState({ userQuery: query, requestedImg: [], page: 1 });
+  };
 
-  handleLoadMore = async () => {
-    this.setState(prevState => ({ isLoading: true, page: prevState.page + 1 }));
-    const newRequestedImg = await fetchImg(
-      this.state.userQuery,
-      this.state.page + 1
-    );
-    this.updateImages(newRequestedImg);
+  handleLoadMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
   toogleModal = () => {
@@ -55,16 +63,13 @@ export class App extends Component {
     this.setState({ selectedImg: largeImgURL, isShowModal: true });
   };
 
-  handleInputChange = evt => {
-    this.setState({ userQuery: evt });
-  };
-
   render() {
-    const { requestedImg, isLoading, isShowModal, selectedImg } = this.state;
+    const { isLoading, isShowModal, isShowButton, requestedImg, selectedImg } =
+      this.state;
 
     return (
       <div className="App">
-        <Searchbar handleInputChange={this.handleInputChange} />
+        <Searchbar onFormSubmit={this.onFormSubmit} />
 
         {requestedImg.length > 0 && (
           <>
@@ -73,7 +78,7 @@ export class App extends Component {
               onSelect={this.onSelectImg}
             />
             {isLoading && <Loader />}
-            <Button onClick={this.handleLoadMore} isLoading={this.isLoading} />
+            {isShowButton && <Button onClick={this.handleLoadMore} />}
           </>
         )}
 
